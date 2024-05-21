@@ -3024,7 +3024,7 @@ namespace UnityEngine.InputSystem
         {
 #if UNITY_EDITOR
             // Abort if not in play-mode in editor
-            if (!EditorApplication.isPlayingOrWillChangePlaymode)
+            if (!EditorApplication.isPlaying)
                 return;
 #endif // UNITY_EDITOR
             if (actions == null)
@@ -3611,6 +3611,12 @@ namespace UnityEngine.InputSystem
             }
             s_SystemObject.newInputBackendsCheckedAsEnabled = true;
 
+#if UNITY_INPUT_SYSTEM_PROJECT_WIDE_ACTIONS
+            // Make sure project wide input actions are enabled.
+            // Note that this will always fail if entering play-mode within editor since not yet in play-mode.
+            EnableActions();
+#endif
+
             RunInitialUpdate();
 
             Profiler.EndSample();
@@ -3889,6 +3895,12 @@ namespace UnityEngine.InputSystem
             InputEventListener.s_ObserverState = default;
             InputUser.ResetGlobals();
             EnhancedTouchSupport.Reset();
+
+            // This is the point where we initialise project-wide actions for the Editor, Editor Tests and Player Tests.
+            // Note this is too early for editor ! actions is not setup yet.
+            #if UNITY_INPUT_SYSTEM_PROJECT_WIDE_ACTIONS
+            EnableActions();
+            #endif
 
             Profiler.EndSample();
         }
