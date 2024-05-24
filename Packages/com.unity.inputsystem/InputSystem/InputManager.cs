@@ -3650,6 +3650,15 @@ namespace UnityEngine.InputSystem
                     stateOffsetInDevice, statePtr, stateSize, flipped);
             }
 
+            if (makeDeviceCurrent)
+            {
+                // Update the pressed/not pressed state of all buttons that have changed this update
+                foreach (var button in device.m_UpdatedButtons.Values)
+                {
+                    button.UpdateWasPressed(device.m_CurrentUpdateStepCount);
+                }
+            }
+
             // Notify listeners.
             DelegateHelpers.InvokeCallbacksSafe(ref m_DeviceStateChangeListeners,
                 device, eventPtr, "InputSystem.onDeviceStateChange");
